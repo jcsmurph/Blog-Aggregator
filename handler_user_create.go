@@ -31,10 +31,10 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) 
 		Name:      params.Name,
 	})
 
-    if err != nil {
-        respondWithError(w, http.StatusInternalServerError, "Could not create user")
-        fmt.Println(err)
-        return
-    }
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not create user")
+		fmt.Println(err)
+		return
+	}
 	respondWithJSON(w, http.StatusCreated, databaseUserToUser(user))
 }

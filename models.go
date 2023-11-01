@@ -31,7 +31,7 @@ type RssFeed struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Name      string    `json:"name"`
 	Url       string    `json:"url"`
-	UserId   uuid.UUID `json:"user_id"`
+	UserId    uuid.UUID `json:"user_id"`
 }
 
 func databaseFeedToFeed(rssFeed database.RssFeed) RssFeed {
@@ -41,15 +41,42 @@ func databaseFeedToFeed(rssFeed database.RssFeed) RssFeed {
 		UpdatedAt: rssFeed.UpdatedAt,
 		Name:      rssFeed.Name,
 		Url:       rssFeed.Url,
-		UserId:   rssFeed.UserID,
+		UserId:    rssFeed.UserID,
 	}
 }
+
 func databaseFeedsToFeeds(rssFeeds []database.RssFeed) []RssFeed {
-    result := make([]RssFeed, len(rssFeeds))
+	result := make([]RssFeed, len(rssFeeds))
 
 	for i, feed := range rssFeeds {
-        result[i] = databaseFeedToFeed(feed)
-    }
+		result[i] = databaseFeedToFeed(feed)
+	}
 
-    return result
+	return result
+}
+
+type RssFeedFollow struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	FeedId    uuid.UUID `json:"feed_id"`
+	UserId    uuid.UUID `json:"user_id"`
+}
+
+func databaseFeedFollowToFeedFollow(rssFeedFollow database.RssFeedFollow) RssFeedFollow {
+	return RssFeedFollow{
+		ID:        rssFeedFollow.ID,
+		CreatedAt: rssFeedFollow.CreatedAt,
+		UpdatedAt: rssFeedFollow.UpdatedAt,
+		FeedId:    rssFeedFollow.FeedID,
+		UserId:    rssFeedFollow.UserID,
+	}
+}
+
+func databaseFeedFollowsToFeedFollows(feedFollows []database.RssFeedFollow) []RssFeedFollow {
+	result := make([]RssFeedFollow, len(feedFollows))
+	for i, feedFollow := range feedFollows {
+		result[i] = databaseFeedFollowToFeedFollow(feedFollow)
+	}
+	return result
 }

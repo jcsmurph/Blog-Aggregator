@@ -11,7 +11,7 @@ func (cfg *apiConfig) handlerGetFeeds(w http.ResponseWriter, r *http.Request) {
     feeds, err := cfg.DB.GetAllRssFeeds(r.Context())
 
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Could not create user")
+		respondWithError(w, http.StatusInternalServerError, "Could not get feeds")
 		fmt.Println(err)
 		return
 	}

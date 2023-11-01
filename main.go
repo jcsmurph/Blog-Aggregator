@@ -2,13 +2,13 @@ package main
 
 import (
 	"database/sql"
-	"log"
-	"net/http"
-	"os"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"github.com/jscmurph/blog_aggregator/internal/database"
+	"log"
+	"net/http"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -53,14 +53,18 @@ func main() {
 
 	v1Router := chi.NewRouter()
 
-    // User Handlers
+	// User Handlers
 	v1Router.Post("/users", apiCfg.handlerCreateUser)
 	v1Router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerGetUserByAPIKey))
 
-    // Feed Handlers
-    v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
-    v1Router.Get("/feeds", apiCfg.handlerGetFeeds)
-    // Metric Handlers
+	// Feed Handlers
+	v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
+	v1Router.Get("/feeds", apiCfg.handlerGetFeeds)
+	v1Router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerCreateFeedFollow))
+	v1Router.Delete("/feed_follows/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerDeleteFeedFollow))
+	v1Router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerGetFeedFollow))
+
+	// Metric Handlers
 	v1Router.Get("/healthz", handlerReadiness)
 	v1Router.Get("/err", handlerError)
 

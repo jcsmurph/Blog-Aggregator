@@ -52,10 +52,10 @@ func (cfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 	respondWithJSON(w, http.StatusCreated, struct {
-        feed RssFeed
-        feedFollow RssFeedFollow
-    } {
-        feed: databaseFeedToFeed(feed),
-        feedFollow: databaseFeedFollowToFeedFollow(feedFollow),
-    })
+		feed       RssFeed
+		feedFollow RssFeedFollow
+	}{
+		feed:       databaseFeedToFeed(feed),
+		feedFollow: databaseFeedFollowToFeedFollow(feedFollow),
+	})
 }

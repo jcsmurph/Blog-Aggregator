@@ -1,10 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jscmurph/blog_aggregator/internal/database"
+	"github.com/lib/pq"
 )
 
 type User struct {
@@ -32,6 +34,7 @@ type RssFeed struct {
 	Name      string    `json:"name"`
 	Url       string    `json:"url"`
 	UserId    uuid.UUID `json:"user_id"`
+    LastFetched time.Time `json:"last_fetched"`
 }
 
 func databaseFeedToFeed(rssFeed database.RssFeed) RssFeed {
@@ -42,6 +45,7 @@ func databaseFeedToFeed(rssFeed database.RssFeed) RssFeed {
 		Name:      rssFeed.Name,
 		Url:       rssFeed.Url,
 		UserId:    rssFeed.UserID,
+        LastFetched: *nullTimeToTimePtr(rssFeed.LastFetched),
 	}
 }
 
@@ -79,4 +83,11 @@ func databaseFeedFollowsToFeedFollows(feedFollows []database.RssFeedFollow) []Rs
 		result[i] = databaseFeedFollowToFeedFollow(feedFollow)
 	}
 	return result
+}
+
+func nullTimeToTimePtr(t sql.NullTime) *time.Time {
+    if t.Valid {
+        return &t.Time
+    }
+    return nil
 }

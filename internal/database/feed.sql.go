@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,18 +20,20 @@ INSERT INTO rss_feed (
     updated_at,
     name,
     url,
-    user_id
-    ) VALUES ( $1, $2, $3, $4, $5, $6 )
-RETURNING id, created_at, updated_at, name, url, user_id
+    user_id,
+    last_fetched
+    ) VALUES ( $1, $2, $3, $4, $5, $6, $7 )
+RETURNING id, created_at, updated_at, name, url, user_id, last_fetched
 `
 
 type CreateFeedParams struct {
-	ID        uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name      string
-	Url       string
-	UserID    uuid.UUID
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Name        string
+	Url         string
+	UserID      uuid.UUID
+	LastFetched sql.NullTime
 }
 
 func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (RssFeed, error) {
@@ -41,6 +44,7 @@ func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (RssFeed
 		arg.Name,
 		arg.Url,
 		arg.UserID,
+		arg.LastFetched,
 	)
 	var i RssFeed
 	err := row.Scan(
@@ -50,12 +54,13 @@ func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (RssFeed
 		&i.Name,
 		&i.Url,
 		&i.UserID,
+		&i.LastFetched,
 	)
 	return i, err
 }
 
 const getAllRssFeeds = `-- name: GetAllRssFeeds :many
-SELECT id, created_at, updated_at, name, url, user_id FROM rss_feed
+SELECT id, created_at, updated_at, name, url, user_id, last_fetched FROM rss_feed
 `
 
 func (q *Queries) GetAllRssFeeds(ctx context.Context) ([]RssFeed, error) {
@@ -74,6 +79,42 @@ func (q *Queries) GetAllRssFeeds(ctx context.Context) ([]RssFeed, error) {
 			&i.Name,
 			&i.Url,
 			&i.UserID,
+			&i.LastFetched,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getNextFeedsToFetch = `-- name: GetNextFeedsToFetch :many
+SELECT id, created_at, updated_at, name, url, user_id, last_fetched FROM rss_feed ORDER BY last_fetched
+`
+
+func (q *Queries) GetNextFeedsToFetch(ctx context.Context) ([]RssFeed, error) {
+	rows, err := q.db.QueryContext(ctx, getNextFeedsToFetch)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []RssFeed
+	for rows.Next() {
+		var i RssFeed
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+			&i.Url,
+			&i.UserID,
+			&i.LastFetched,
 		); err != nil {
 			return nil, err
 		}

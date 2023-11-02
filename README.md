@@ -2,7 +2,7 @@
 
 This applications links to your favorite blogs and returns their content.
 
-# Supported Features
+## Supported Features
 - User Creation
 - Create new Blog feeds that link to your favorite blogs
 - Follow feeds that are created by other users

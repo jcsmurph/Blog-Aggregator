@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jscmurph/blog_aggregator/internal/database"
-	"github.com/lib/pq"
 )
 
 type User struct {
@@ -28,24 +27,24 @@ func databaseUserToUser(user database.User) User {
 }
 
 type RssFeed struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Name      string    `json:"name"`
-	Url       string    `json:"url"`
-	UserId    uuid.UUID `json:"user_id"`
-    LastFetched time.Time `json:"last_fetched"`
+	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Name        string    `json:"name"`
+	Url         string    `json:"url"`
+	UserId      uuid.UUID `json:"user_id"`
+	LastFetched time.Time `json:"last_fetched"`
 }
 
 func databaseFeedToFeed(rssFeed database.RssFeed) RssFeed {
 	return RssFeed{
-		ID:        rssFeed.ID,
-		CreatedAt: rssFeed.CreatedAt,
-		UpdatedAt: rssFeed.UpdatedAt,
-		Name:      rssFeed.Name,
-		Url:       rssFeed.Url,
-		UserId:    rssFeed.UserID,
-        LastFetched: *nullTimeToTimePtr(rssFeed.LastFetched),
+		ID:          rssFeed.ID,
+		CreatedAt:   rssFeed.CreatedAt,
+		UpdatedAt:   rssFeed.UpdatedAt,
+		Name:        rssFeed.Name,
+		Url:         rssFeed.Url,
+		UserId:      rssFeed.UserID,
+		LastFetched: *nullTimeToTimePtr(rssFeed.LastFetched),
 	}
 }
 
@@ -85,9 +84,48 @@ func databaseFeedFollowsToFeedFollows(feedFollows []database.RssFeedFollow) []Rs
 	return result
 }
 
+type Post struct {
+	ID           uuid.UUID `json:"id"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	Title        string    `json:"title"`
+	Url          string    `json:"url"`
+	Description  string    `json:"description"`
+	Published_At time.Time `json:"published_at"`
+	FeedID       uuid.UUID `json:"feed_id"`
+}
+
+func databasePostToPost(post database.Post) Post {
+	return Post{
+		ID:           post.ID,
+		CreatedAt:    post.CreatedAt,
+		UpdatedAt:    post.UpdatedAt,
+		Title:        post.Title,
+		Url:          post.Url,
+		Description:  *nullStringToStringPtr(post.Description),
+		Published_At: *nullTimeToTimePtr(post.PublishedAt),
+		FeedID:       post.FeedID,
+	}
+}
+
+func databasePostsToPosts(posts []database.Post) []Post {
+	result := make([]Post, len(posts))
+	for i, post := range posts {
+		result[i] = databasePostToPost(post)
+	}
+	return result
+}
+
+func nullStringToStringPtr(s sql.NullString) *string {
+	if s.Valid {
+		return &s.String
+	}
+	return nil
+}
+
 func nullTimeToTimePtr(t sql.NullTime) *time.Time {
-    if t.Valid {
-        return &t.Time
-    }
-    return nil
+	if t.Valid {
+		return &t.Time
+	}
+	return nil
 }

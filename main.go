@@ -2,13 +2,15 @@ package main
 
 import (
 	"database/sql"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"github.com/jscmurph/blog_aggregator/internal/database"
-	"log"
-	"net/http"
-	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -64,6 +66,9 @@ func main() {
 	v1Router.Delete("/feed_follows/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerDeleteFeedFollow))
 	v1Router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerGetFeedFollow))
 
+    // Post Handlers
+	v1Router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handlerGetPosts))
+
 	// Metric Handlers
 	v1Router.Get("/healthz", handlerReadiness)
 	v1Router.Get("/err", handlerError)
@@ -73,6 +78,10 @@ func main() {
 		Addr:    ":" + port,
 		Handler: router,
 	}
+
+    const collectionConcurrenct = 10
+    const collectionInterval = time.Minute
+    go startScraping(dbQueries, collectionConcurrenct, collectionInterval)
 
 	log.Printf("Serving on port: %s\n", port)
 	log.Fatal(srv.ListenAndServe())

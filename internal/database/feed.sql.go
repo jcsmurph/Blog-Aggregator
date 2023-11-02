@@ -95,11 +95,11 @@ func (q *Queries) GetAllRssFeeds(ctx context.Context) ([]RssFeed, error) {
 }
 
 const getNextFeedsToFetch = `-- name: GetNextFeedsToFetch :many
-SELECT id, created_at, updated_at, name, url, user_id, last_fetched FROM rss_feed ORDER BY last_fetched
+SELECT id, created_at, updated_at, name, url, user_id, last_fetched FROM rss_feed ORDER BY last_fetched ASC NULLS FIRST LIMIT $1
 `
 
-func (q *Queries) GetNextFeedsToFetch(ctx context.Context) ([]RssFeed, error) {
-	rows, err := q.db.QueryContext(ctx, getNextFeedsToFetch)
+func (q *Queries) GetNextFeedsToFetch(ctx context.Context, limit int32) ([]RssFeed, error) {
+	rows, err := q.db.QueryContext(ctx, getNextFeedsToFetch, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -127,4 +127,24 @@ func (q *Queries) GetNextFeedsToFetch(ctx context.Context) ([]RssFeed, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const markFeedFetched = `-- name: MarkFeedFetched :one
+UPDATE rss_feed SET updated_at = NOW(), last_fetched = NOW() WHERE id = $1
+RETURNING id, created_at, updated_at, name, url, user_id, last_fetched
+`
+
+func (q *Queries) MarkFeedFetched(ctx context.Context, id uuid.UUID) (RssFeed, error) {
+	row := q.db.QueryRowContext(ctx, markFeedFetched, id)
+	var i RssFeed
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.Url,
+		&i.UserID,
+		&i.LastFetched,
+	)
+	return i, err
 }

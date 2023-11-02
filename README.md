@@ -25,7 +25,7 @@ This applications links to your favorite blogs and returns their content.
 - Use the API to follow other blogs that have been created by other users
 
 # Supported APIs
-- Create a User (POST localhost:8080/v1/users)
+- Create a User (POST localhost:8080/v1/users)  
 Body:
 ```
 {
@@ -33,7 +33,7 @@ Body:
 }
 
 ```
-- Get User Information (GET localhost:8080/v1/users)
+- Get User Information (GET localhost:8080/v1/users)  
 Body:
 ```
 {
@@ -42,31 +42,31 @@ Body:
 
 ```
 
-- Create a feed (POST localhost:8080/v1/feeds)
+- Create a feed (POST localhost:8080/v1/feeds)  
 Header:
 ```
 Request Headers: Authorization: ApiKey <key>
 ```
 
-- Follow a created feed (POST localhost:8080/v1/feed_follows)
+- Follow a created feed (POST localhost:8080/v1/feed_follows)  
 Header:
 ```
 Request Headers: Authorization: ApiKey <key>
 ```
 
-- Unfollow a feed (DELETE localhost:8080/v1/feed_follows/{feedFollowID})
+- Unfollow a feed (DELETE localhost:8080/v1/feed_follows/{feedFollowID})  
 Header:
 ```
 Request Headers: Authorization: ApiKey <key>
 ```
 
-- Unfollow a feed (DELETE localhost:8080/v1/feed_follows/{feedFollowID})
+- Unfollow a feed (DELETE localhost:8080/v1/feed_follows/{feedFollowID})  
 Header:
 ```
 Request Headers: Authorization: ApiKey <key>
 ```
 
-- Get posts from a feed (GET localhost:8080/v1/posts?limit=)
+- Get posts from a feed (GET localhost:8080/v1/posts?limit=)  
 Header:
 ```
 Request Headers: Authorization: ApiKey <key>

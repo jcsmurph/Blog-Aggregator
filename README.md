@@ -11,7 +11,7 @@ This applications links to your favorite blogs and returns their content.
 # Supported Feeds
 -XML
 
-#Prerequisites
+# Prerequisites
 - Postgres <https://www.postgresql.org/download/>
 - Postgres Client <https://www.pgadmin.org/download/pgadmin-4-container/>
 - Goose for Database Migrations <https://github.com/pressly/goose>

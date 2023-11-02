@@ -19,6 +19,7 @@ This applications links to your favorite blogs and returns their content.
 ## To Run
 - Clone the repository locally
 - Create a database in postgres
+- On the command line, build the project using go build -o {name} && ./{name}
 - On the command line, run goose postgres postgres://postgres:USERNAME@HOST:PORT/DATABASE?sslmode=disable up to create the necessary tables
 - Use an API client to create a user and get an API token
 - Use the API token to create a feed to your favorite blog
